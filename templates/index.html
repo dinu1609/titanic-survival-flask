@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanic | Passenger Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="ship-logo">🚢</div>
+            <h2>TITANIC</h2>
+            <p>PASSENGER INSIGHTS</p>
+        </div>
+
+        <nav>
+            <a class="active" href="#overview">⌂ <span>Overview</span></a>
+            <a href="#explore">◉ <span>Explore</span></a>
+            <a href="#analytics">▥ <span>Analytics</span></a>
+            <a href="#predictions">⌁ <span>Predictions</span></a>
+            <a href="#insights">♧ <span>Insights</span></a>
+            <a href="#about">ⓘ <span>About</span></a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p>Machine Learning Project</p>
+            <small>Built with Python & Flask</small>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <h2>⚓ PASSENGER INSIGHTS</h2>
+            <div class="top-actions">
+                <button type="button" id="themeToggle">🌙 Dark mode</button>
+                <a href="#about" class="about-button">ⓘ About Titanic</a>
+            </div>
+        </header>
+
+        <!-- OVERVIEW -->
+        <section class="hero-section" id="overview">
+
+            <div class="hero-card">
+                <div class="eyebrow">A DATA EXPLORATION</div>
+
+                <h1>One <span>journey.</span><br>
+                    Many <span>stories.</span>
+                </h1>
+
+                <p>
+                    Explore the factors behind passenger survival
+                    on the Titanic.
+                </p>
+
+                <p>Enter a passenger profile to get started.</p>
+
+                <div class="hero-ship">🚢</div>
+                <div class="hero-footer">
+                    Discover the stories behind the historic voyage.
+                </div>
+            </div>
+
+            <!-- PASSENGER FORM -->
+            <div class="form-card" id="predictions">
+
+                <div class="section-heading">
+                    <h2>👤 Passenger details</h2>
+                    <p>Fill in the details below to continue.</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('home') }}">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>🎟️ Ticket class</label>
+                            <select name="pclass" required>
+                                <option value="" disabled
+                                    {% if not request.form.get('pclass') %}selected{% endif %}>
+                                    Select class
+                                </option>
+                                <option value="1" {% if request.form.get('pclass') == '1' %}selected{% endif %}>1st class</option>
+                                <option value="2" {% if request.form.get('pclass') == '2' %}selected{% endif %}>2nd class</option>
+                                <option value="3" {% if request.form.get('pclass') == '3' %}selected{% endif %}>3rd class</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>🎂 Age (in years)</label>
+                            <input type="number" name="age" min="0"
+                                max="120" step="1" required
+                                placeholder="Enter age"
+                                value="{{ request.form.get('age', '') }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>👤 Gender</label>
+                            <select name="sex" required>
+                                <option value="female" {% if request.form.get('sex') == 'female' %}selected{% endif %}>Female</option>
+                                <option value="male" {% if request.form.get('sex', 'male') == 'male' %}selected{% endif %}>Male</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>💵 Ticket fare</label>
+                            <input type="number" name="fare" min="0"
+                                step="0.01" required placeholder="Enter fare"
+                                value="{{ request.form.get('fare', '') }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>👨‍👩‍👧 Siblings / spouses</label>
+                            <input type="number" name="sibsp" min="0"
+                                max="20" required
+                                value="{{ request.form.get('sibsp', '0') }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>👪 Parents / children</label>
+                            <input type="number" name="parch" min="0"
+                                max="20" required
+                                value="{{ request.form.get('parch', '0') }}">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>⚓ Port of embarkation</label>
+                            <select name="embarked" required>
+                                <option value="" disabled
+                                    {% if not request.form.get('embarked') %}selected{% endif %}>
+                                    Select port
+                                </option>
+                                <option value="C" {% if request.form.get('embarked') == 'C' %}selected{% endif %}>Cherbourg</option>
+                                <option value="Q" {% if request.form.get('embarked') == 'Q' %}selected{% endif %}>Queenstown</option>
+                                <option value="S" {% if request.form.get('embarked') == 'S' %}selected{% endif %}>Southampton</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <button class="predict-button" type="submit">
+                        🚀 Explore passenger profile
+                    </button>
+                </form>
+
+                {% if error %}
+                <div class="prediction-result error">
+                    <strong>⚠️ {{ error }}</strong>
+                </div>
+                {% endif %}
+
+                {% if result %}
+                <div class="prediction-result {% if result.survived %}success{% else %}warning{% endif %}">
+                    <div>
+                        <small>Model prediction:</small>
+                        <h3>
+                            {% if result.survived %}
+                                Likely to survive
+                            {% else %}
+                                Likely not to survive
+                            {% endif %}
+                        </h3>
+                    </div>
+                    <div class="probability">
+                        <small>Estimated survival probability</small>
+                        <h2>{{ "%.1f"|format(result.probability * 100) }}%</h2>
+                    </div>
+                </div>
+                {% endif %}
+
+                <p class="privacy-note">
+                    Predictions are generated using your trained machine-learning model.
+                </p>
+            </div>
+        </section>
+
+        <!-- STATISTICS -->
+        <section class="stats-section" id="explore">
+
+            <div class="stats-card">
+                <h3>Titanic at a glance</h3>
+
+                <div class="stat-grid">
+
+                    <div class="stat-box blue">
+                        <div class="stat-icon">👥</div>
+                        <h2>{{ stats.total }}</h2>
+                        <p>Total passengers</p>
+                    </div>
+
+                    <div class="stat-box green">
+                        <div class="stat-icon">✔️</div>
+                        <h2>{{ stats.survived }}</h2>
+                        <p>Survived</p>
+                    </div>
+
+                    <div class="stat-box red">
+                        <div class="stat-icon">❌</div>
+                        <h2>{{ stats.not_survived }}</h2>
+                        <p>Did not survive</p>
+                    </div>
+
+                    <div class="stat-box orange">
+                        <div class="stat-icon">％</div>
+                        <h2>{{ stats.rate }}%</h2>
+                        <p>Survival rate</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- GENDER CHART -->
+            <div class="chart-card" id="analytics">
+                <h3>Survival by gender</h3>
+                <canvas id="genderChart"></canvas>
+            </div>
+
+            <!-- CLASS CHART -->
+            <div class="chart-card">
+                <h3>Survival by class</h3>
+                <canvas id="classChart"></canvas>
+            </div>
+
+        </section>
+
+        <!-- INSIGHTS -->
+        <section class="insights-card" id="insights">
+            <h2>💡 Passenger insights</h2>
+            <div class="insights-grid">
+                <div>
+                    <h3>Female passengers</h3>
+                    <p>{{ gender_stats.female }}% survival rate</p>
+                </div>
+                <div>
+                    <h3>Male passengers</h3>
+                    <p>{{ gender_stats.male }}% survival rate</p>
+                </div>
+                <div>
+                    <h3>First class</h3>
+                    <p>{{ class_stats.first }}% survival rate</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT -->
+        <footer id="about">
+            <h3>About the Titanic project</h3>
+            <p>
+                This project uses Python, Flask, Pandas and Scikit-learn
+                to explore passenger survival patterns and predict survival
+                from passenger details.
+            </p>
+            <small>Educational Machine Learning Project</small>
+        </footer>
+
+    </main>
+</div>
+
+<!-- CHARTS -->
+<script>
+    const genderData = {{ gender_chart | tojson }};
+    const classData = {{ class_chart | tojson }};
+
+    new Chart(document.getElementById("genderChart"), {
+        type: "doughnut",
+        data: {
+            labels: genderData.labels,
+            datasets: [{
+                data: genderData.values,
+                backgroundColor: ["#fa3677", "#365cf5"],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: "bottom" }
+            }
+        }
+    });
+
+    new Chart(document.getElementById("classChart"), {
+        type: "bar",
+        data: {
+            labels: classData.labels,
+            datasets: [{
+                label: "Survival rate (%)",
+                data: classData.values,
+                backgroundColor: ["#13b86a", "#ffb000", "#fa4775"],
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: value => value + "%" }
+                }
+            }
+        }
+    });
+
+    document.getElementById("themeToggle").addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
+        this.textContent = document.body.classList.contains("dark-mode")
+            ? "☀️ Light mode"
+            : "🌙 Dark mode";
+    });
+</script>
+
+</body>
+</html>
