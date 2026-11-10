@@ -10,13 +10,13 @@
 }
 
 :root {
-    --primary: #3858f5;
-    --purple: #8c35e9;
-    --pink: #ed3d9b;
-    --text: #171d50;
+    --primary: #087F5B;
+    --purple: #065F46;
+    --pink: 	#D1FAE5;
+    --text: #F0FDF4;
     --muted: #718096;
-    --surface: #ffffff;
-    --background: #f5f4fc;
+    --surface: #059669;
+    --background: #050311;
 }
 
 html {
