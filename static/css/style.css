@@ -1,4 +1,4 @@
-
+﻿
 /* =====================================
    TITANIC PASSENGER INSIGHTS DASHBOARD
    ===================================== */
@@ -12,11 +12,11 @@
 :root {
     --primary: #087F5B;
     --purple: #065F46;
-    --pink: 	#D1FAE5;
-    --text: #F0FDF4;
-    --muted: #718096;
-    --surface: #059669;
-    --background: #050311;
+    --pink: #D1FAE5;
+    --text: #14532D;
+    --muted: #4B5563;
+    --surface: #DCFCE7;
+    --background: #F0FDF4;
 }
 
 html {
@@ -191,7 +191,7 @@ body {
 }
 
 .hero-card::after {
-    content: "🌊";
+    content: "ðŸŒŠ";
     position: absolute;
     bottom: 20px;
     left: 0;
@@ -671,3 +671,4 @@ body.dark-mode .prediction-result.error {
         padding: 22px 16px;
     }
 }
+
